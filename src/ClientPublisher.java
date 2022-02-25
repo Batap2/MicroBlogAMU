@@ -21,6 +21,7 @@ public class ClientPublisher {
         System.out.println("Veuillez entrer votre nom d'utilisateur");
         String pseudo = scanner.next();
 
+        int bou = 1;
 
 
 
