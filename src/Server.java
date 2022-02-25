@@ -8,19 +8,7 @@ public class Server {
 
     public static void main(String args[]) throws IOException {
 
-        int port = 0;
-        if(args.length != 2){
-            System.out.println("usage : java MultiThreadServer <port>");
-            System.exit(-1);
-        } else {
-            if (args[0].equals("-t")){
-                nbThread = Integer.parseInt(args[1]);
-                port = Integer.parseInt(args[2]);
-            } else {
-                System.out.println("usage : java MultiThreadServer [-t nbThread] <port>");
-                System.exit(-1);
-            }
-        }
+        int port = 12345;
 
         System.out.println("père : " + ProcessHandle.current().pid());
         ServerSocket ss = new ServerSocket(port);
@@ -31,9 +19,7 @@ public class Server {
                 SocketHandler socketHandler = new SocketHandler(ss.accept());
                 System.out.println("ouf");
                 executorService.execute(socketHandler);
-
-                //Thread t = new Thread(socketHandler);
-                //t.start();
+                
             }
         } catch(IOException e){
             System.out.println("IOException");
