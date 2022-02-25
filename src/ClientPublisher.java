@@ -7,18 +7,13 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class ClientPublisher {
+public class ClientPublisher extends Client {
 
     public static void main(String args[]) throws IOException {
 
-        InetAddress inetAddress = InetAddress.getLocalHost();
-        String ip = inetAddress.getHostAddress();
+        ClientPublisher client = new ClientPublisher();
+        Socket socket = client.connection();
 
-        int port = 12345;
-
-        Socket socket = new Socket();
-        InetSocketAddress inetSocketAddress = new InetSocketAddress(ip, port);
-        socket.connect(inetSocketAddress);
         BufferedReader inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
         Scanner keyboard = new Scanner(System.in);

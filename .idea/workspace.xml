@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9362202c-be29-4680-9d54-61b5b53ef5f0" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/Client.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/ClientFollower.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/MicroBlogAMU/ClientPublisher.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/MicroBlogAMU/ClientPublisher.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ClientPublisher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ClientPublisher.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
