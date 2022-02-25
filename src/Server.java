@@ -17,9 +17,7 @@ public class Server {
         try{
             while(true){
                 SocketHandler socketHandler = new SocketHandler(ss.accept());
-                System.out.println("ouf");
                 executorService.execute(socketHandler);
-
             }
         } catch(IOException e){
             System.out.println("IOException");

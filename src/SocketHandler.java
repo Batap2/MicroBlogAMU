@@ -5,37 +5,41 @@ import java.net.Socket;
 import java.net.SocketException;
 
 public class SocketHandler implements Runnable{
-    Socket s;
+    private Socket socket;
+    private enum Request {PUBLISH, RCV_IDS, RCV_MSG, REPLY, REPUBLISH};
 
-    public SocketHandler(Socket soc){
-        s = soc;
+    public SocketHandler(Socket s){
+        this.socket = s;
     }
 
     @Override
     public void run() {
         try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             while(true){
                 try {
-                    String msg = in.readLine();
+                    String receivedInfo = in.readLine();
 
-                    if (msg != null) {
-
-                        msg = ">" + msg + "\n";
-                        System.out.println(msg);
-                        s.getOutputStream().write(msg.getBytes());
-                    } else {
+                    if (receivedInfo == null) {
                         System.out.println(">>>>>>>>>> Client déconnecté <<<<<<<<<<");
                         break;
+                    } else {
+                        recoRequest(receivedInfo);
+
                     }
                 } catch (SocketException e){
                     System.out.println(">>>>>>>>>> Client déconnecté <<<<<<<<<<");
                     break;
                 }
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    public Request recoRequest(String receivedInfo){
+        String request = receivedInfo.
     }
 }
