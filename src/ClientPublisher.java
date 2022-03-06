@@ -38,14 +38,13 @@ public class ClientPublisher{
             String corps = keyboard.nextLine();
 
             corps = corps + "\r\n";
-            String message = entete + corps + "\n";
-            System.out.println(message);
+            String message = entete + corps + "";
             byte[] msg = message.getBytes();
 
             OutputStream outputStream = socket.getOutputStream();
             outputStream.write(msg);
 
-            System.out.println(inputStream.readLine());
+            System.out.println("Reponse : " + inputStream.readLine());
         }
 
 

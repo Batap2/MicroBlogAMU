@@ -35,7 +35,7 @@ public class EchoTCPClient {
             OutputStream outputStream = socket.getOutputStream();
             outputStream.write(msg);
 
-            System.out.println(inputStream.readLine());
+            //System.out.println(inputStream.readLine());
         }
     }
 }
