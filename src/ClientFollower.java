@@ -98,15 +98,19 @@ public class ClientFollower extends Client{
             outputStream.write(msg);
 
             //boucle pour avoir tous les id des messages, puis les redonner au serveur pour afficher les messages
-            while(inputStream.ready()){
-                String id = inputStream.readLine();
-                String requete = "RCV_MSG msg_id:"+id;
-                byte[] message = requete.getBytes();
-                outputStream.write(message);
+            String allID = inputStream.readLine();
+            int lengthResponse = allID.length();
+            while(allID.contains(" ")){
+              String id = allID.substring(0, allID.indexOf(" ")+1);
+              allID = allID.substring(allID.indexOf(" ")+1, lengthResponse);
+              lengthResponse = allID.length();
+              String requete = "RCV_MSG msg_id:"+id;
+              byte[] message = requete.getBytes();
+              outputStream.write(message);
 
-                System.out.println("Message : " + inputStream.readLine());
-
+              System.out.println("Message : " + inputStream.readLine());
             }
+
 
             clientFollower.reinit();
 
