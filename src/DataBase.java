@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataBase {
 
@@ -24,6 +26,7 @@ public class DataBase {
         dbPath = Paths.get("msgDB");
         lastMsgID = getLastIDFromDB();
         System.out.println("lastMsgID : " + lastMsgID);
+
     }
 
     public void writeMsgToDB(Message msg) throws IOException {
@@ -61,7 +64,7 @@ public class DataBase {
                 }
                 current++;
                 StringBuilder msg = new StringBuilder();
-                while(line.charAt(current) != '\r'){
+                while(current < line.length()){
                     msg.append(line.charAt(current));
                     current++;
                 }
@@ -72,6 +75,14 @@ public class DataBase {
         }
         db.close();
         return null;
+    }
+
+    public ArrayList<Integer> getIdFromRCV_IDS(String[] params){
+        ArrayList<Integer> idList = new ArrayList<>();
+        for(String param : params){
+            System.out.println(param);
+        }
+        return idList;
     }
 
     private int getLastIDFromDB() throws IOException {
