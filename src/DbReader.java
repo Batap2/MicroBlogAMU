@@ -5,12 +5,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class dbReader {
+public class DbReader {
     private File dbFile;
     private Path dbPath;
     BufferedReader db;
 
-    public dbReader() throws IOException {
+    public DbReader() throws IOException {
         dbFile = new File("msgDB");
         dbFile.createNewFile();
         dbPath = Paths.get("msgDB");

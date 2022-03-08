@@ -1,7 +1,9 @@
+import javax.lang.model.type.IntersectionType;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Deque;
 
 public class SocketHandler implements Runnable{
 
@@ -78,6 +80,7 @@ public class SocketHandler implements Runnable{
                 rcv_ids();
                 break;
             case UNKNOWN:
+                response("ERROR");
                 System.out.println("UNKNOWN");
         }
     }
@@ -191,10 +194,21 @@ public class SocketHandler implements Runnable{
             response("ERROR");
             return;
         }
+
         StringBuilder returnIds = new StringBuilder();
-        for(Integer id : Server.db.getIdFromRCV_IDS(params)){
-            returnIds.append(id).append(' ');
+        Deque<Integer> returnedIds = Server.db.getIdFromRCV_IDS(params);
+        int n = returnedIds.size();
+
+        if(n == 0){
+            response("Aucun message trouvé");
+            return;
         }
+
+        for(int i = 0; i < n; i++){
+            returnIds.append(returnedIds.poll()).append(' ');
+        }
+        returnIds.deleteCharAt(returnIds.toString().length() - 1);
+
         System.out.println("response : " + returnIds.toString());
         response(returnIds.toString());
     }
