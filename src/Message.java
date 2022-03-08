@@ -3,9 +3,8 @@ public class Message {
     private String author;
     private String body;
 
-    public Message(String author, String body){
-        Server.db.setLastMsgID(Server.db.getLastMsgID() + 1);
-        ident = Server.db.getLastMsgID();
+    public Message(int ident, String author, String body){
+        this.ident = ident;
         this.author = author;
         this.body = body;
     }
@@ -20,5 +19,10 @@ public class Message {
 
     public String getAuthor() {
         return author;
+    }
+
+    @Override
+    public String toString(){
+        return "Msg ID : " + getIdent() + ", Author:" + getAuthor() +"\r\n" + getBody();
     }
 }

@@ -102,12 +102,11 @@ public class SocketHandler implements Runnable{
                 current++;
             }
 
-            message = new Message(author.toString(), body.toString());
+            message = Server.db.writeMsgToDB(author.toString(), body.toString());
 
             System.out.println("Msg ID : " + message.getIdent());
             System.out.println(message.getBody());
 
-            Server.db.writeMsgToDB(message);
             response("OK");
         } catch (IndexOutOfBoundsException e){
             System.out.println("incorrect PUBLISH request");
@@ -135,7 +134,7 @@ public class SocketHandler implements Runnable{
                     current++;
                 }
                 current++;
-                
+
                 if(param.toString().equals("author")){
                     paramIndex = 0;
                 } else if(param.toString().equals("tag")){

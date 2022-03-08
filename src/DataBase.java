@@ -29,51 +29,29 @@ public class DataBase {
 
     }
 
-    public void writeMsgToDB(Message msg) throws IOException {
+    public Message writeMsgToDB(String author, String body) throws IOException {
+        setLastMsgID(getLastMsgID() + 1);
+        Message msg = new Message(getLastMsgID(), author, body);
         String dbLine = msg.getIdent() + " " + msg.getAuthor() + " " + msg.getBody() + "\n";
         FileWriter fileWriter = new FileWriter(dbFile, true);
         fileWriter.append(dbLine);
         fileWriter.close();
+        return msg;
     }
 
     public Message getMessageById(int id) throws IOException {
+        dbReader dbReader = new dbReader();
         if(lastMsgID == 0){
             return null;
         }
 
-        BufferedReader db = Files.newBufferedReader(dbPath);
-        String line;
-        line = db.readLine();
+        Message msg = dbReader.nextMsg();
 
-        while(line != null){
-            StringBuilder index = new StringBuilder();
-
-            int current = 0;
-            while(line.charAt(current) != ' '){
-                index.append(line.charAt(current));
-                current++;
+        while(msg != null) {
+            if(msg.getIdent() == id){
+                return msg;
             }
-            int msgId = Integer.parseInt(index.toString());
-            if(msgId == id){
-                StringBuilder author = new StringBuilder();
-                current++;
-
-                while(line.charAt(current) != ' '){
-                    author.append(line.charAt(current));
-                    current++;
-                }
-                current++;
-                StringBuilder msg = new StringBuilder();
-                while(current < line.length()){
-                    msg.append(line.charAt(current));
-                    current++;
-                }
-                db.close();
-                return new Message(author.toString(), msg.toString());
-            }
-            line = db.readLine();
         }
-        db.close();
         return null;
     }
 
@@ -115,7 +93,7 @@ public class DataBase {
         return lastMsgID;
     }
 
-    public void setLastMsgID(int lastMsgID) {
+    private void setLastMsgID(int lastMsgID) {
         this.lastMsgID = lastMsgID;
     }
 }
