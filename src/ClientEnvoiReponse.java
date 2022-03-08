@@ -35,7 +35,11 @@ public class ClientEnvoiReponse {
             OutputStream outputStream = socket.getOutputStream();
             outputStream.write(msg);
 
-            System.out.println("réponse : " + inputStream.readLine());
+            String received = inputStream.readLine();
+            while(inputStream.ready()){
+                received = received + "\r\n" + inputStream.readLine() + "\r\n";
+            }
+            System.out.println("réponse : " + received);
         }
     }
 }

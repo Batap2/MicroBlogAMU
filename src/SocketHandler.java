@@ -79,6 +79,15 @@ public class SocketHandler implements Runnable{
             case RCV_IDS:
                 rcv_ids();
                 break;
+            case RCV_MSG:
+                rcv_msg();
+                break;
+            case REPLY:
+                reply();
+                break;
+            case REPUBLISH:
+                republish();
+                break;
             case UNKNOWN:
                 response("ERROR");
                 System.out.println("UNKNOWN");
@@ -212,6 +221,52 @@ public class SocketHandler implements Runnable{
         System.out.println("response : " + returnIds.toString());
         response(returnIds.toString());
     }
+
+    public void rcv_msg() throws IOException {
+        int i = 0;
+        StringBuilder checkCommand = new StringBuilder();
+        while(i < received.length() && received.charAt(i) != ':'){
+            checkCommand.append(received.charAt(i));
+            i++;
+        }
+        if(!checkCommand.toString().equals("RCV_MSG msg_id")){
+            System.out.println("incorrect RCV_MSG request");
+            response("ERROR");
+            return;
+        }
+        i++;
+        StringBuilder id = new StringBuilder();
+        while(i < received.length()){
+            id.append(received.charAt(i));
+            i++;
+        }
+        String idStr = id.toString();
+        if(idStr.length() == 0){
+            System.out.println("incorrect RCV_MSG args");
+            response("ERROR");
+            return;
+        }
+        for(int c = 0; c < idStr.length(); c++){
+            if(!Character.isDigit(idStr.charAt(c))){
+                System.out.println("incorrect RCV_MSG args");
+                response("ERROR");
+                return;
+            }
+        }
+
+        Message msg = Server.db.getMessageById(Integer.parseInt(idStr));
+        if(msg == null){
+            response("Aucun message d'ID " + id);
+            return;
+        }
+
+        System.out.println("MSG msg_id: " + msg.getIdent() + "\r\n" + msg.getBody());
+        response("MSG msg_id: " + msg.getIdent() + "\r\n" + msg.getBody());
+    }
+
+    public void reply(){}
+
+    public void republish(){}
 
     public void response(String resp) throws IOException {
         resp += "\n";

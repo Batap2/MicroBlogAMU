@@ -52,6 +52,7 @@ public class DataBase {
             if(msg.getIdent() == id){
                 return msg;
             }
+            msg = dbReader.nextMsg();
         }
         return null;
     }
