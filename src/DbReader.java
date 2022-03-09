@@ -26,6 +26,7 @@ public class DbReader {
     }
 
     private Message dbLineToMessage(String line){
+        //TODO a refaire
         int current = 0;
         StringBuilder id = new StringBuilder();
         StringBuilder author = new StringBuilder();

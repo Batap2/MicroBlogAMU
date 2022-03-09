@@ -4,6 +4,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SocketHandler implements Runnable{
 
@@ -264,9 +266,54 @@ public class SocketHandler implements Runnable{
         response("MSG msg_id: " + msg.getIdent() + "\r\n" + msg.getBody());
     }
 
-    public void reply(){}
+    public void reply() throws IOException {
+        //TODO finir
+        Pattern p = Pattern.compile("^REPLY author:(@\\w+) reply_to_id:(\\d+)\\r\\n(.+)$");
+        Matcher m = p.matcher(received);
+        if(!m.matches()){
+            System.out.println("REPUBLISH syntax error");
+            response("ERROR");
+            return;
+        }
 
-    public void republish(){}
+        String author = m.group(1);
+        String id = m.group(2);
+        String body = m.group(3);
+
+        Message researchedMsg = Server.db.getMessageById(Integer.parseInt(id));
+        if(researchedMsg == null){
+            System.out.println("Aucun message trouvé pour l'ID " + id);
+            response("ERROR");
+            return;
+        }
+
+        Server.db.writeMsgToDB(author, "["+id+"] "+body);
+        response("OK");
+    }
+
+    public void republish() throws IOException {
+        //TODO finir
+        Pattern p = Pattern.compile("^REPUBLISH author:(@\\w+) msg_id:(\\d+)$");
+        Matcher m = p.matcher(received);
+        if(!m.matches()){
+            System.out.println("REPUBLISH syntax error");
+            response("ERROR");
+            return;
+        }
+
+        String author = m.group(1);
+        String id = m.group(2);
+
+        Message researchedMsg = Server.db.getMessageById(Integer.parseInt(id));
+        if(researchedMsg == null){
+            System.out.println("Aucun message trouvé pour l'ID " + id);
+            response("ERROR");
+            return;
+        }
+
+        Server.db.writeMsgToDB(author, researchedMsg.getBody());
+        response("OK");
+    }
 
     public void response(String resp) throws IOException {
         resp += "\n";
