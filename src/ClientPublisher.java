@@ -14,9 +14,10 @@ public class ClientPublisher extends Client{
         ClientPublisher client = new ClientPublisher();
         Socket socket = new Socket();
         socket = client.connection(socket);
-        
+
 
         BufferedReader inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
 
         Scanner keyboard = new Scanner(System.in);
         System.out.println("Veuillez entrer votre nom d'utilisateur");

@@ -92,6 +92,7 @@ public class ClientFollower extends Client{
                 envoi = envoi+" limit:"+clientFollower.limit;
             }
 
+            envoi = envoi+"\r\n";
             byte[] msg = envoi.getBytes();
 
             OutputStream outputStream = socket.getOutputStream();
@@ -108,7 +109,7 @@ public class ClientFollower extends Client{
               String id = allID.substring(0, allID.indexOf(" ")+1);
               allID = allID.substring(allID.indexOf(" ")+1, lengthResponse);
               lengthResponse = allID.length();
-              String requete = "RCV_MSG msg_id:"+id;
+              String requete = "RCV_MSG msg_id:"+id+"\r\n";
               byte[] message = requete.getBytes();
 
               OutputStream outputStream2 = socket.getOutputStream();
