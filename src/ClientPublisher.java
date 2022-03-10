@@ -7,21 +7,14 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class ClientPublisher{
+public class ClientPublisher extends Client{
 
     public static void main(String args[]) throws IOException {
 
         ClientPublisher client = new ClientPublisher();
-        Socket socket;
-
-        InetAddress inetAddress = InetAddress.getLocalHost();
-        String ip = inetAddress.getHostAddress();
-
-        int port = 12345;
-
-        socket = new Socket();
-        InetSocketAddress inetSocketAddress = new InetSocketAddress(ip, port);
-        socket.connect(inetSocketAddress);
+        Socket socket = new Socket();
+        socket = client.connection(socket);
+        
 
         BufferedReader inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
