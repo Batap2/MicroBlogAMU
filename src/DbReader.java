@@ -28,9 +28,9 @@ public class DbReader {
     }
 
     private Message dbLineToMessage(String line){
-        Pattern p = Pattern.compile("^author:@(\\w+) msg_id:(\\d+) \\| (.+)$");
-        Pattern p_reply = Pattern.compile("author:@(\\w+) msg_id:(\\d+) reply_to_id:(\\d+) \\| (.+)");
-        Pattern p_republish = Pattern.compile("author:@(\\w+) msg_id:(\\d+) republished:\\w+ \\| (.+)");
+        Pattern p = Pattern.compile("^author:(@\\w+) msg_id:(\\d+) \\| (.+)$");
+        Pattern p_reply = Pattern.compile("author:(@\\w+) msg_id:(\\d+) reply_to_id:(\\d+) \\| (.+)");
+        Pattern p_republish = Pattern.compile("author:(@\\w+) msg_id:(\\d+) republished:\\w+ \\| (.+)");
         Matcher m = p.matcher(line);
         Message msg;
 

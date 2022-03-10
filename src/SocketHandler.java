@@ -117,8 +117,6 @@ public class SocketHandler implements Runnable{
 
     public void rcv_ids() throws IOException {
 
-        System.out.println("im here l117");
-
         String[] params = new String[4]; // [author, tag, since_id, limit] null si ignoré
         params[3] = "5";
 
@@ -196,7 +194,6 @@ public class SocketHandler implements Runnable{
             return;
         }
 
-        System.out.println("im here l193");
 
         StringBuilder returnIds = new StringBuilder();
         Deque<Integer> returnedIds = Server.db.getIdFromRCV_IDS(params);
