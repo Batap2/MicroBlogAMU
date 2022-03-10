@@ -39,7 +39,6 @@ public class ClientFollower extends Client{
         socket = clientFollower.connection(socket);
 
         BufferedReader inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        OutputStream outputStream = socket.getOutputStream();
 
 
         Scanner keyBoard = new Scanner(System.in);
@@ -95,10 +94,15 @@ public class ClientFollower extends Client{
 
             byte[] msg = envoi.getBytes();
 
+            OutputStream outputStream = socket.getOutputStream();
             outputStream.write(msg);
+
+            System.out.println(envoi);
+            System.out.println("a envoyé");
 
             //boucle pour avoir tous les id des messages, puis les redonner au serveur pour afficher les messages
             String allID = inputStream.readLine();
+            System.out.println(allID);
             int lengthResponse = allID.length();
             while(allID.contains(" ")){
               String id = allID.substring(0, allID.indexOf(" ")+1);
@@ -106,7 +110,9 @@ public class ClientFollower extends Client{
               lengthResponse = allID.length();
               String requete = "RCV_MSG msg_id:"+id;
               byte[] message = requete.getBytes();
-              outputStream.write(message);
+
+              OutputStream outputStream2 = socket.getOutputStream();
+              outputStream2.write(message);
 
               System.out.println("Message : " + inputStream.readLine());
             }

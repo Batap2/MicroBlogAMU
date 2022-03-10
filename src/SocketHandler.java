@@ -24,6 +24,7 @@ public class SocketHandler implements Runnable{
                 try {
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     received = in.readLine();
+                    System.out.println(received);
                     while(in.ready()){
                         received = received + "\r\n" + in.readLine();
                     }
@@ -56,6 +57,8 @@ public class SocketHandler implements Runnable{
             request.append(received.charAt(current));
             current++;
         }
+
+        System.out.println("l60");
 
         switch(request.toString()){
             case "PUBLISH":
@@ -113,6 +116,9 @@ public class SocketHandler implements Runnable{
     }
 
     public void rcv_ids() throws IOException {
+
+        System.out.println("im here l117");
+
         String[] params = new String[4]; // [author, tag, since_id, limit] null si ignoré
         params[3] = "5";
 
@@ -189,6 +195,8 @@ public class SocketHandler implements Runnable{
             response("ERROR", "RCV_IDS syntax error");
             return;
         }
+
+        System.out.println("im here l193");
 
         StringBuilder returnIds = new StringBuilder();
         Deque<Integer> returnedIds = Server.db.getIdFromRCV_IDS(params);
