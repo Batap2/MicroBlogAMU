@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DbReader {
     private File dbFile;
@@ -26,26 +28,23 @@ public class DbReader {
     }
 
     private Message dbLineToMessage(String line){
-        //TODO a refaire
-        int current = 0;
-        StringBuilder id = new StringBuilder();
-        StringBuilder author = new StringBuilder();
-        StringBuilder msg = new StringBuilder();
+        Pattern p = Pattern.compile("^author:@(\\w+) msg_id:(\\d+) \\| (.+)$");
+        Pattern p_reply = Pattern.compile("author:@(\\w+) msg_id:(\\d+) reply_to_id:(\\d+) \\| (.+)");
+        Pattern p_republish = Pattern.compile("author:@(\\w+) msg_id:(\\d+) republished:\\w+ \\| (.+)");
+        Matcher m = p.matcher(line);
+        Message msg;
 
-        while(line.charAt(current) != ' '){
-            id.append(line.charAt(current));
-            current++;
+        if(m.matches()){
+            return new Message(Integer.parseInt(m.group(2)), m.group(1), m.group(3));
         }
-        current++;
-        while(line.charAt(current) != ' '){
-            author.append(line.charAt(current));
-            current++;
+        m = p_reply.matcher(line);
+        if(m.matches()){
+            return new Message(Integer.parseInt(m.group(2)), m.group(1), m.group(4), Integer.parseInt(m.group(3)));
         }
-        current++;
-        while(current < line.length()){
-            msg.append(line.charAt(current));
-            current++;
+        m = p_republish.matcher(line);
+        if(m.matches()){
+            return new Message(Integer.parseInt(m.group(2)), m.group(1), m.group(3), true);
         }
-        return new Message(Integer.parseInt(id.toString()), author.toString(), msg.toString());
+        return null;
     }
 }

@@ -5,11 +5,28 @@ public class Message {
     private String author;
     private String body;
     private ArrayList<String> tagList;
+    private int reply_to_id = -1;
+    private boolean isRepublished = false;
 
     public Message(int ident, String author, String body){
         this.ident = ident;
         this.author = author;
         this.body = body;
+        tagList = recoTag();
+    }
+    public Message(int ident, String author, String body, int reply_to_id){
+        this.ident = ident;
+        this.author = author;
+        this.body = body;
+        this.reply_to_id = reply_to_id;
+        tagList = recoTag();
+    }
+
+    public Message(int ident, String author, String body, boolean isRepublished){
+        this.ident = ident;
+        this.author = author;
+        this.body = body;
+        this.isRepublished = isRepublished;
         tagList = recoTag();
     }
 
@@ -23,6 +40,14 @@ public class Message {
 
     public String getAuthor() {
         return author;
+    }
+
+    public int getReply_to_id(){
+        return reply_to_id;
+    }
+
+    public boolean isRepublished() {
+        return isRepublished;
     }
 
     public ArrayList<String> getTagList() {
@@ -47,8 +72,20 @@ public class Message {
         return tags;
     }
 
+    public String getEnTete(){
+        String str = "author:" + getAuthor() + " msg_id: " + getIdent();
+        if(reply_to_id != -1){
+            str = str + " reply_to_id:" + getReply_to_id();
+        }
+        if(isRepublished){
+            str = str + " republished:true";
+        }
+        return str;
+    }
     @Override
     public String toString(){
-        return "Msg ID : " + getIdent() + ", Author:" + getAuthor() +"\r\n" + getBody();
+        String str = getEnTete();
+        str = str + "\r\n" + getBody();
+        return str;
     }
 }

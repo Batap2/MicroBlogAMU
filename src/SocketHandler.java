@@ -25,7 +25,7 @@ public class SocketHandler implements Runnable{
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     received = in.readLine();
                     while(in.ready()){
-                        received = received + "\r\n" + in.readLine() + "\r\n";
+                        received = received + "\r\n" + in.readLine();
                     }
                     System.out.println("-------------\n" + received + "\n-------------");
 
@@ -91,41 +91,25 @@ public class SocketHandler implements Runnable{
                 republish();
                 break;
             case UNKNOWN:
-                response("ERROR");
+                response("ERROR", "Unknown request");
                 System.out.println("UNKNOWN");
         }
     }
 
     public void publish() throws IOException {
-        StringBuilder author = new StringBuilder();
-        StringBuilder body = new StringBuilder();
-        Message message;
-
-        try{
-            int current = 0;
-            while(received.charAt(current) != '@'){
-                current++;
-            }
-            while(received.charAt(current) != '\r'){
-                author.append(received.charAt(current));
-                current++;
-            }
-            current += 2;
-            while(received.charAt(current) != '\r'){
-                body.append(received.charAt(current));
-                current++;
-            }
-
-            message = Server.db.writeMsgToDB(author.toString(), body.toString());
-
-            System.out.println("Msg ID : " + message.getIdent());
-            System.out.println(message.getBody());
-
-            response("OK");
-        } catch (IndexOutOfBoundsException e){
-            System.out.println("incorrect PUBLISH request");
-            response("ERROR");
+        Pattern p = Pattern.compile("^PUBLISH author:(@\\w+)\\r\\n(.+)$");
+        Matcher m = p.matcher(received);
+        if(!m.matches()){
+            System.out.println("PUBLISH syntax error");
+            response("ERROR", "PUBLISH syntax error");
+            return;
         }
+
+        String author = m.group(1);
+        String body = m.group(2);
+
+        Server.db.writeMsgToDB(author, body);
+        response("OK");
     }
 
     public void rcv_ids() throws IOException {
@@ -159,7 +143,7 @@ public class SocketHandler implements Runnable{
                     paramIndex = 3;
                 } else {
                     System.out.println("incorrect RCV_IDS args");
-                    response("ERROR");
+                    response("ERROR", "RCV_IDS args error");
                     return;
                 }
 
@@ -194,7 +178,7 @@ public class SocketHandler implements Runnable{
                 }
                 if(error){
                     System.out.println("incorrect RCV_IDS args value");
-                    response("ERROR");
+                    response("ERROR", "RCV_IDS args error");
                     return;
                 }
 
@@ -202,7 +186,7 @@ public class SocketHandler implements Runnable{
             }
         } catch(IndexOutOfBoundsException e){
             System.out.println("incorrect RCV_IDS request");
-            response("ERROR");
+            response("ERROR", "RCV_IDS syntax error");
             return;
         }
 
@@ -211,7 +195,7 @@ public class SocketHandler implements Runnable{
         int n = returnedIds.size();
 
         if(n == 0){
-            response("Aucun message trouvé");
+            response("ERROR", "No message found");
             return;
         }
 
@@ -221,7 +205,7 @@ public class SocketHandler implements Runnable{
         returnIds.deleteCharAt(returnIds.toString().length() - 1);
 
         System.out.println("response : " + returnIds.toString());
-        response(returnIds.toString());
+        response("MSG_IDS", returnIds.toString());
     }
 
     public void rcv_msg() throws IOException {
@@ -233,7 +217,7 @@ public class SocketHandler implements Runnable{
         }
         if(!checkCommand.toString().equals("RCV_MSG msg_id")){
             System.out.println("incorrect RCV_MSG request");
-            response("ERROR");
+            response("ERROR", "RCV_MSG syntax error");
             return;
         }
         i++;
@@ -245,13 +229,13 @@ public class SocketHandler implements Runnable{
         String idStr = id.toString();
         if(idStr.length() == 0){
             System.out.println("incorrect RCV_MSG args");
-            response("ERROR");
+            response("ERROR", "RCV_MSG args error");
             return;
         }
         for(int c = 0; c < idStr.length(); c++){
             if(!Character.isDigit(idStr.charAt(c))){
                 System.out.println("incorrect RCV_MSG args");
-                response("ERROR");
+                response("ERROR", "RCV_MSG args error");
                 return;
             }
         }
@@ -263,16 +247,15 @@ public class SocketHandler implements Runnable{
         }
 
         System.out.println("MSG msg_id: " + msg.getIdent() + "\r\n" + msg.getBody());
-        response("MSG msg_id: " + msg.getIdent() + "\r\n" + msg.getBody());
+        response("MSG","MSG msg_id: " + msg);
     }
 
     public void reply() throws IOException {
-        //TODO finir
         Pattern p = Pattern.compile("^REPLY author:(@\\w+) reply_to_id:(\\d+)\\r\\n(.+)$");
         Matcher m = p.matcher(received);
         if(!m.matches()){
-            System.out.println("REPUBLISH syntax error");
-            response("ERROR");
+            System.out.println("REPLY syntax error");
+            response("ERROR", "REPLY syntax error");
             return;
         }
 
@@ -283,21 +266,20 @@ public class SocketHandler implements Runnable{
         Message researchedMsg = Server.db.getMessageById(Integer.parseInt(id));
         if(researchedMsg == null){
             System.out.println("Aucun message trouvé pour l'ID " + id);
-            response("ERROR");
+            response("ERROR", "No message found");
             return;
         }
 
-        Server.db.writeMsgToDB(author, "["+id+"] "+body);
+        Server.db.writeMsgToDB(author, body, Integer.parseInt(id));
         response("OK");
     }
 
     public void republish() throws IOException {
-        //TODO finir
         Pattern p = Pattern.compile("^REPUBLISH author:(@\\w+) msg_id:(\\d+)$");
         Matcher m = p.matcher(received);
         if(!m.matches()){
             System.out.println("REPUBLISH syntax error");
-            response("ERROR");
+            response("ERROR", "REPUBLISH syntax error");
             return;
         }
 
@@ -307,16 +289,20 @@ public class SocketHandler implements Runnable{
         Message researchedMsg = Server.db.getMessageById(Integer.parseInt(id));
         if(researchedMsg == null){
             System.out.println("Aucun message trouvé pour l'ID " + id);
-            response("ERROR");
+            response("ERROR", "No message found");
             return;
         }
 
-        Server.db.writeMsgToDB(author, researchedMsg.getBody());
+        Server.db.writeMsgToDB(author, researchedMsg.getBody(), true);
         response("OK");
     }
 
-    public void response(String resp) throws IOException {
-        resp += "\n";
+    public void response(String enTete, String body) throws IOException {
+        String resp = enTete + "\r\n" + body + "\n";
+        socket.getOutputStream().write(resp.getBytes());
+    }
+    public void response(String enTete) throws IOException {
+        String resp = enTete + "\n";
         socket.getOutputStream().write(resp.getBytes());
     }
 }

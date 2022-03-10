@@ -1,3 +1,5 @@
+package testClient;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,16 +10,8 @@ import java.util.Scanner;
 public class ClientEnvoiReponse {
     public static void main(String args[] ) throws IOException {
 
-        if(args.length < 2){
-            System.out.println("usage : <ip> <port>");
-            System.exit(-1);
-        }
-
-        String serv = args[0];
-        int port = Integer.parseInt(args[1]);
-
         Socket socket = new Socket();
-        InetSocketAddress inetSocketAddress = new InetSocketAddress(serv, port);
+        InetSocketAddress inetSocketAddress = new InetSocketAddress("localhost", 12345);
         
         socket.connect(inetSocketAddress);
 

@@ -17,7 +17,6 @@ public class Server {
     public static void main(String args[]) throws IOException {
 
         int port = 12345;
-        System.out.println(db.getMessageById(50));
 
         System.out.println("Server ready");
         ServerSocket ss = new ServerSocket(port);

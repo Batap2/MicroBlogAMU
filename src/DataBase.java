@@ -3,41 +3,71 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.Queue;
 
 public class DataBase {
 
-    private File dbFile;
-    private Path dbPath;
+    private File msgDB;
+    private Path msgDBPath;
+    private File subscribeDB;
+    private Path subscribeDBPath;
 
     private int msgNumber = 0;
     private int lastMsgID = 0;
 
     public DataBase() throws IOException {
-        dbFile = new File("msgDB");
-        if(dbFile.createNewFile()){
-            System.out.println("msgDB created at : " + dbFile.getAbsolutePath());
+        msgDB = new File("msgDB");
+        subscribeDB = new File("subscribeDB");
+        if(msgDB.createNewFile()){
+            System.out.println("msgDB created at : " + msgDB.getAbsolutePath());
         } else {
-            System.out.println("msgDB founded at : " + dbFile.getAbsolutePath());
+            System.out.println("msgDB founded at : " + msgDB.getAbsolutePath());
         }
-        dbPath = Paths.get("msgDB");
+        if(subscribeDB.createNewFile()){
+            System.out.println("subscribeDB created at : " + subscribeDB.getAbsolutePath());
+        } else {
+            System.out.println("subscribeDB founded at : " + subscribeDB.getAbsolutePath());
+        }
+        msgDBPath = Paths.get("msgDB");
+        subscribeDBPath = Paths.get("subscribeDB");
 
         initLastIdAndMsgNumber();
         System.out.println("lastMsgID : " + lastMsgID + ", msgNumber : " + msgNumber);
     }
 
-    public Message writeMsgToDB(String author, String body) throws IOException {
-        setLastMsgID(getLastMsgID() + 1);
-        setMsgNumber(getMsgNumber() + 1);
-        Message msg = new Message(getLastMsgID(), author, body);
-        String dbLine = msg.getIdent() + " " + msg.getAuthor() + " " + msg.getBody() + "\n";
-        FileWriter fileWriter = new FileWriter(dbFile, true);
+    private void writeMsg(String enTete, String body) throws IOException {
+        String dbLine = enTete + " | " + body + "\n";
+        FileWriter fileWriter = new FileWriter(msgDB, true);
         fileWriter.append(dbLine);
         fileWriter.close();
+    }
+
+    public Message writeMsgToDB(String author, String body) throws IOException {
+        String enTete = "author:"+author+" msg_id:"+nextID();
+        Message msg = new Message(getLastMsgID(), author, body);
+        writeMsg(enTete, body);
         return msg;
+    }
+
+    public Message writeMsgToDB(String author, String body, int reply_to_id) throws IOException {
+        String enTete = "author:"+author+" msg_id:"+nextID()+" reply_to_id:"+reply_to_id;
+        Message msg = new Message(getLastMsgID(), author, body, reply_to_id);
+        writeMsg(enTete, body);
+        return msg;
+    }
+
+    public Message writeMsgToDB(String author, String body, boolean isRepublished) throws IOException {
+        String enTete = "author:"+author+" msg_id:"+nextID()+" republished:"+isRepublished;
+        Message msg = new Message(getLastMsgID(), author, body, isRepublished);
+        writeMsg(enTete, body);
+        return msg;
+    }
+
+    private int nextID(){
+        setLastMsgID(getLastMsgID() + 1);
+        setMsgNumber(getMsgNumber() + 1);
+        return getLastMsgID();
     }
 
     public Message getMessageById(int id) throws IOException {
