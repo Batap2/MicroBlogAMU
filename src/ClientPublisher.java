@@ -9,6 +9,8 @@ import java.util.Scanner;
 
 public class ClientPublisher extends Client{
 
+    private String pseudo;
+
     public static void main(String args[]) throws IOException {
 
         ClientPublisher client = new ClientPublisher();
@@ -18,13 +20,11 @@ public class ClientPublisher extends Client{
 
         BufferedReader inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-
         Scanner keyboard = new Scanner(System.in);
-        System.out.println("Veuillez entrer votre nom d'utilisateur");
-        String pseudo = keyboard.nextLine();
-        System.out.println("Bienvenue @"+pseudo);
 
-        String entete = "PUBLISH author:@"+pseudo+"\r\n";
+        client.pseudo = client.identification(keyboard);
+
+        String entete = "PUBLISH author:@"+client.pseudo+"\r\n";
 
         System.out.println("Vous pouvez désormais entrer vos messages");
 

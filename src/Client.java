@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.Scanner;
 
 public abstract class Client {
 
@@ -15,6 +16,15 @@ public abstract class Client {
         InetSocketAddress inetSocketAddress = new InetSocketAddress(ip, port);
         socket.connect(inetSocketAddress);
         return socket;
+    }
+
+    public String identification(Scanner keyboard){
+
+        System.out.println("Veuillez entrer votre nom d'utilisateur");
+        String pseudo = keyboard.nextLine();
+        System.out.println("Bienvenue @"+pseudo);
+        return pseudo;
+
     }
 
 }
