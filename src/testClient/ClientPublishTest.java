@@ -14,7 +14,7 @@ public class ClientPublishTest {
         s.connect(i);
         BufferedReader inputStream = new BufferedReader(new InputStreamReader(s.getInputStream()));
 
-        String str = "PUBLISH author:@PublishMan\r\nSalut les gars, moi juste je publie par contre.\r\n";
+        String str = "PUBLISH author:@PublishMan\r\nSalut les gars, moi juste je publie par contre. #publish #publiKun\r\n";
         byte[] msg = str.getBytes();
 
         OutputStream outputStream = s.getOutputStream();
@@ -24,6 +24,6 @@ public class ClientPublishTest {
         while(inputStream.ready()){
             received = received + "\r\n" + inputStream.readLine() + "\r\n";
         }
-        System.out.println("réponse : " + received);
+        System.out.println("réponse :\n" + received);
     }
 }

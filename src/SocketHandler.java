@@ -4,14 +4,16 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SocketHandler implements Runnable{
 
-    private enum Request {PUBLISH, RCV_IDS, RCV_MSG, REPLY, REPUBLISH, UNKNOWN};
+    private enum Request {PUBLISH, RCV_IDS, RCV_MSG, REPLY, REPUBLISH, CONNECT, SUBSCRIBE, UNSUBSCRIBE, UNKNOWN};
     private Socket socket;
     private String received;
+    private String connectedAuthor = null;
 
     public SocketHandler(Socket s){
         this.socket = s;
@@ -31,7 +33,13 @@ public class SocketHandler implements Runnable{
                     System.out.println("-------------\n" + received + "\n-------------");
 
                     if (received == null) {
-                        System.out.println(">>>>>>>>>> Client déconnecté <<<<<<<<<<");
+                        System.out.println(">>>>>>>>>> Client déconnecté(1) <<<<<<<<<<");
+                        if(connectedAuthor != null && Server.connectedClients.containsKey(connectedAuthor)){
+                            Server.connectedClients.get(connectedAuthor).remove(this);
+                            if(Server.connectedClients.get(connectedAuthor).size() == 0){
+                                Server.connectedClients.remove(connectedAuthor);
+                            }
+                        }
                         break;
                     } else {
                         Request request = recoRequest();
@@ -39,7 +47,14 @@ public class SocketHandler implements Runnable{
 
                     }
                 } catch (SocketException e){
-                    System.out.println(">>>>>>>>>> Client déconnecté <<<<<<<<<<");
+                    System.out.println(">>>>>>>>>> Client déconnecté(2) <<<<<<<<<<");
+                    if(connectedAuthor != null && Server.connectedClients.containsKey(connectedAuthor)){
+                        Server.connectedClients.get(connectedAuthor).remove(this);
+                        if(Server.connectedClients.get(connectedAuthor).size() == 0){
+                            Server.connectedClients.remove(connectedAuthor);
+                        }
+                    }
+                    printConnected();
                     break;
                 }
             }
@@ -58,8 +73,6 @@ public class SocketHandler implements Runnable{
             current++;
         }
 
-        System.out.println("l60");
-
         switch(request.toString()){
             case "PUBLISH":
                 return Request.PUBLISH;
@@ -71,6 +84,12 @@ public class SocketHandler implements Runnable{
                 return Request.REPLY;
             case "REPUBLISH":
                 return Request.REPUBLISH;
+            case "CONNECT":
+                return Request.CONNECT;
+            case "SUBSCRIBE":
+                return Request.SUBSCRIBE;
+            case "UNSUBSCRIBE":
+                return Request.UNSUBSCRIBE;
             default:
                 return Request.UNKNOWN;
         }
@@ -93,6 +112,15 @@ public class SocketHandler implements Runnable{
             case REPUBLISH:
                 republish();
                 break;
+            case CONNECT:
+                connect();
+                break;
+            case SUBSCRIBE:
+                subscribe();
+                break;
+            case UNSUBSCRIBE:
+                unsubscribe();
+                break;
             case UNKNOWN:
                 response("ERROR", "Unknown request");
                 System.out.println("UNKNOWN");
@@ -111,7 +139,9 @@ public class SocketHandler implements Runnable{
         String author = m.group(1);
         String body = m.group(2);
 
-        Server.db.writeMsgToDB(author, body);
+        Message msg = Server.db.writeMsgToDB(author, body);
+        notifAll(msg);
+
         response("OK");
     }
 
@@ -247,12 +277,12 @@ public class SocketHandler implements Runnable{
 
         Message msg = Server.db.getMessageById(Integer.parseInt(idStr));
         if(msg == null){
-            response("Aucun message d'ID " + id);
+            response("ERROR", "Aucun message d'ID " + id);
             return;
         }
 
         System.out.println("MSG msg_id: " + msg.getIdent() + "\r\n" + msg.getBody());
-        response("MSG","MSG msg_id: " + msg);
+        response("MSG",msg.getEnTete() + "\n" +msg.getBody());
     }
 
     public void reply() throws IOException {
@@ -302,12 +332,138 @@ public class SocketHandler implements Runnable{
         response("OK");
     }
 
+    public void connect() throws IOException {
+        Pattern p = Pattern.compile("^CONNECT author:(@\\w+)$");
+        Matcher m = p.matcher(received);
+        if(!m.matches()){
+            System.out.println("CONNECT syntax error");
+            response("ERROR", "CONNECT syntax error");
+            return;
+        }
+
+        if(connectedAuthor != null){
+            System.out.println("CONNECT Already connected");
+            response("ERROR", "Already connected");
+            return;
+        }
+        connectedAuthor = m.group(1);
+        if(Server.connectedClients.containsKey(connectedAuthor)){
+            Server.connectedClients.get(connectedAuthor).add(this);
+        } else {
+            ArrayList<SocketHandler> clientSocketList = new ArrayList<>();
+            clientSocketList.add(this);
+            Server.connectedClients.put(connectedAuthor, clientSocketList);
+        }
+
+        response("OK");
+
+        printConnected();
+    }
+
+    public void subscribe() throws IOException {
+        if(connectedAuthor == null){
+            System.out.println("SUBSCRIBE connect error");
+            response("ERROR", "You must be connected");
+            return;
+        }
+        Pattern p_a = Pattern.compile("^SUBSCRIBE author:(@\\w+)$");
+        Pattern p_t = Pattern.compile("^SUBSCRIBE tag:(#\\w+)$");
+        Matcher m = p_a.matcher(received);
+
+        if(!m.matches()){
+            m = p_t.matcher(received);
+            if(!m.matches()){
+                System.out.println("SUBSCRIBE syntax error");
+                response("ERROR", "SUBSCRIBE syntax error");
+                return;
+            }
+        }
+
+        Server.db.subscribe(connectedAuthor, m.group(1));
+        response("OK");
+    }
+
+    public void unsubscribe() throws IOException {
+        if(connectedAuthor == null){
+            System.out.println("UNSUBSCRIBE connect error");
+            response("ERROR", "You must be connected");
+            return;
+        }
+        Pattern p_a = Pattern.compile("^UNSUBSCRIBE author:(@\\w+)$");
+        Pattern p_t = Pattern.compile("^UNSUBSCRIBE tag:(#\\w+)$");
+        Matcher m = p_a.matcher(received);
+
+        if(!m.matches()){
+            m = p_t.matcher(received);
+            if(!m.matches()){
+                System.out.println("UNSUBSCRIBE syntax error");
+                response("ERROR", "UNSUBSCRIBE syntax error");
+                return;
+            }
+        }
+
+        Server.db.unSubscribe(connectedAuthor, m.group(1));
+        response("OK");
+    }
+
+    private void notifAll(Message msg) throws IOException {
+        ArrayList<String> researched = new ArrayList<>();
+        ArrayList<String> clients = new ArrayList<>();
+
+        researched.add(msg.getAuthor());
+        researched.addAll(msg.getTagList());
+
+        SubscriptionDBIO sub = new SubscriptionDBIO();
+
+        Subscription subscription = sub.nextSubscription();
+        while(subscription != null){
+            if(researched.contains(subscription.getSubscription())){
+                String[] subs = subscription.getSubscribers();
+
+                for(String s : subs){
+                    if(!clients.contains(s)){
+                        clients.add(s);
+                    }
+                }
+            }
+            subscription = sub.nextSubscription();
+        }
+        for(String client : clients){
+            if(Server.connectedClients.containsKey(client)){
+                ArrayList<SocketHandler> instances = Server.connectedClients.get(client);
+                for(SocketHandler instance : instances){
+                    instance.notif(msg);
+                }
+            }
+        }
+    }
+
+    public void notif(Message msg) throws IOException {
+        response("MSG",msg.getEnTete() + "\n" +msg.getBody());
+    }
+
     public void response(String enTete, String body) throws IOException {
         String resp = enTete + "\r\n" + body + "\n";
         socket.getOutputStream().write(resp.getBytes());
     }
     public void response(String enTete) throws IOException {
-        String resp = enTete + "\n";
+        String resp = enTete + "\r\n";
         socket.getOutputStream().write(resp.getBytes());
+    }
+
+    public String getConnectedAuthor(){
+        return connectedAuthor;
+    }
+
+    public void printConnected(){
+        System.out.println("---------Connected---------");
+        for(ArrayList<SocketHandler> l : Server.connectedClients.values()){
+            System.out.print("[ ");
+            for(int i = 0; i < l.size(); i++){
+                System.out.print(l.get(i).getConnectedAuthor()+" ");
+            }
+            System.out.println("]");
+        }
+        System.out.println("---------------------------");
     }
 }

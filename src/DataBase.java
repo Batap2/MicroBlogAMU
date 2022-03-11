@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Deque;
@@ -10,37 +11,30 @@ public class DataBase {
 
     private File msgDB;
     private Path msgDBPath;
-    private File subscribeDB;
-    private Path subscribeDBPath;
+    private File subscriptionDB;
+    private Path subscriptionDBPath;
 
     private int msgNumber = 0;
     private int lastMsgID = 0;
 
     public DataBase() throws IOException {
         msgDB = new File("msgDB");
-        subscribeDB = new File("subscribeDB");
+        subscriptionDB = new File("subscriptionDB");
         if(msgDB.createNewFile()){
             System.out.println("msgDB created at : " + msgDB.getAbsolutePath());
         } else {
             System.out.println("msgDB founded at : " + msgDB.getAbsolutePath());
         }
-        if(subscribeDB.createNewFile()){
-            System.out.println("subscribeDB created at : " + subscribeDB.getAbsolutePath());
+        if(subscriptionDB.createNewFile()){
+            System.out.println("subscriptionDB created at : " + subscriptionDB.getAbsolutePath());
         } else {
-            System.out.println("subscribeDB founded at : " + subscribeDB.getAbsolutePath());
+            System.out.println("subscriptionDB founded at : " + subscriptionDB.getAbsolutePath());
         }
         msgDBPath = Paths.get("msgDB");
-        subscribeDBPath = Paths.get("subscribeDB");
+        subscriptionDBPath = Paths.get("subscriptionDB");
 
         initLastIdAndMsgNumber();
         System.out.println("lastMsgID : " + lastMsgID + ", msgNumber : " + msgNumber);
-    }
-
-    private void writeMsg(String enTete, String body) throws IOException {
-        String dbLine = enTete + " | " + body + "\n";
-        FileWriter fileWriter = new FileWriter(msgDB, true);
-        fileWriter.append(dbLine);
-        fileWriter.close();
     }
 
     public Message writeMsgToDB(String author, String body) throws IOException {
@@ -64,37 +58,31 @@ public class DataBase {
         return msg;
     }
 
-    private int nextID(){
-        setLastMsgID(getLastMsgID() + 1);
-        setMsgNumber(getMsgNumber() + 1);
-        return getLastMsgID();
-    }
-
     public Message getMessageById(int id) throws IOException {
-        DbReader dbReader = new DbReader();
+        MsgDBReader msgDBReader = new MsgDBReader();
         if(lastMsgID == 0){
             return null;
         }
 
-        Message msg = dbReader.nextMsg();
+        Message msg = msgDBReader.nextMsg();
 
         while(msg != null) {
             if(msg.getIdent() == id){
                 return msg;
             }
-            msg = dbReader.nextMsg();
+            msg = msgDBReader.nextMsg();
         }
         return null;
     }
 
     // params : [author, tag, since_id, limit] null si ignoré
     public Deque<Integer> getIdFromRCV_IDS(String[] params) throws IOException {
-        DbReader dbReader = new DbReader();
+        MsgDBReader msgDBReader = new MsgDBReader();
         Deque<Integer> idList = new LinkedList<>();
 
 
         boolean isValid;
-        Message msg = dbReader.nextMsg();
+        Message msg = msgDBReader.nextMsg();
         while(msg != null){
             isValid = true;
             if(params[0] != null){
@@ -119,22 +107,47 @@ public class DataBase {
                 }
             }
 
-            msg = dbReader.nextMsg();
+            msg = msgDBReader.nextMsg();
         }
 
         return idList;
     }
 
+    // author = @author, subscription = [@author | #tag]
+    public void subscribe(String author, String subscription) throws IOException {
+        SubscriptionDBIO sub = new SubscriptionDBIO();
+        sub.subscribe(author, subscription);
+    }
+
+    public boolean unSubscribe(String author, String subscription) throws IOException {
+        SubscriptionDBIO sub = new SubscriptionDBIO();
+        sub.unSubscribe(author, subscription);
+        return true;
+    }
+
+    private int nextID(){
+        setLastMsgID(getLastMsgID() + 1);
+        setMsgNumber(getMsgNumber() + 1);
+        return getLastMsgID();
+    }
+
+    private void writeMsg(String enTete, String body) throws IOException {
+        String dbLine = enTete + " | " + body + "\n";
+        FileWriter fileWriter = new FileWriter(msgDB, true);
+        fileWriter.append(dbLine);
+        fileWriter.close();
+    }
+
     private void initLastIdAndMsgNumber() throws IOException {
-        DbReader dbReader = new DbReader();
+        MsgDBReader msgDBReader = new MsgDBReader();
         int msg_number = 0;
 
-        Message temp = dbReader.nextMsg();
+        Message temp = msgDBReader.nextMsg();
         Message lastMsg = null;
         while(temp != null){
             msg_number++;
             lastMsg = temp;
-            temp = dbReader.nextMsg();
+            temp = msgDBReader.nextMsg();
         }
 
         msgNumber = msg_number;

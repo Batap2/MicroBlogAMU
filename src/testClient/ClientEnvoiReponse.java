@@ -31,9 +31,9 @@ public class ClientEnvoiReponse {
 
             String received = inputStream.readLine();
             while(inputStream.ready()){
-                received = received + "\r\n" + inputStream.readLine() + "\r\n";
+                received = received + "\r\n" + inputStream.readLine();
             }
-            System.out.println("réponse : " + received);
+            System.out.println("réponse :\n" + received);
         }
     }
 }

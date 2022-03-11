@@ -7,12 +7,12 @@ import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DbReader {
+public class MsgDBReader {
     private File dbFile;
     private Path dbPath;
     BufferedReader db;
 
-    public DbReader() throws IOException {
+    public MsgDBReader() throws IOException {
         dbFile = new File("msgDB");
         dbFile.createNewFile();
         dbPath = Paths.get("msgDB");

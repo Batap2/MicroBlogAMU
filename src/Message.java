@@ -84,8 +84,6 @@ public class Message {
     }
     @Override
     public String toString(){
-        String str = getEnTete();
-        str = str + "\r\n" + getBody();
-        return str;
+        return getEnTete() + "\r\n" + getBody() + "\r\n";
     }
 }
