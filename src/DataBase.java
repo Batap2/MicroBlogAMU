@@ -144,23 +144,29 @@ public class DataBase {
 
         String clientName = reader.nextWaitingClient();
         if(clientName == null){
-            writer.write(client + " " + id + "\n");
+            String w = client + " " + id + "\n";
+            writer.write(w);
             waitingMsgDB.delete();
             tempDBFile.renameTo(waitingMsgDB);
             writer.close();
             return;
         }
 
+        boolean found = false;
         while(clientName != null){
             if(clientName.equals(client)){
-                writer.write(reader.getLine() + " " + id + "\n");
+                found = true;
+                String w = reader.getLine() + " " + id + "\n";
+                writer.write(w);
             } else {
-                writer.write(reader.getLine());
+                writer.write(reader.getLine() + "\n");
             }
             clientName = reader.nextWaitingClient();
         }
 
-        writer.write(client + " " + id + "\n");
+        if(!found){
+            writer.write(client + " " + id + "\n");
+        }
         waitingMsgDB.delete();
         tempDBFile.renameTo(waitingMsgDB);
         writer.close();
@@ -177,6 +183,7 @@ public class DataBase {
                 deleteClientWaitList(client);
                 return msgIds;
             }
+            clientName = reader.nextWaitingClient();
         }
         return msgIds;
     }
@@ -195,10 +202,8 @@ public class DataBase {
         }
 
         while(clientName != null){
-            if(clientName.equals(client)){
-                continue;
-            } else {
-                writer.write(reader.getLine());
+            if(!clientName.equals(client)){
+                writer.write(reader.getLine() + "\n");
             }
             clientName = reader.nextWaitingClient();
         }

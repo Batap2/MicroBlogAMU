@@ -16,13 +16,21 @@ public class ClientFollowTest {
 
         String str = "CONNECT author:@batap\n";
         byte[] msg = str.getBytes();
-
         s.getOutputStream().write(msg);
+        /*
+        Thread.sleep(500);
 
         str = "SUBSCRIBE author:@lol\n";
         msg = str.getBytes();
-         Thread.sleep(1000);
         s.getOutputStream().write(msg);
+
+        Thread.sleep(500);
+
+        str = "SUBSCRIBE author:@publishMan\n";
+        msg = str.getBytes();
+        s.getOutputStream().write(msg);
+
+         */
 
         while(true){
             String received = inputStream.readLine();

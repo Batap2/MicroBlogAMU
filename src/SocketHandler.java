@@ -26,11 +26,10 @@ public class SocketHandler implements Runnable{
                 try {
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     received = in.readLine();
-                    System.out.println(received);
                     while(in.ready()){
                         received = received + "\r\n" + in.readLine();
                     }
-                    System.out.println("-------------\n" + received + "\n-------------");
+                    System.out.println("--------- receiving: --------\n" + received + "\n-----------------------------");
 
                     if (received == null) {
                         System.out.println(">>>>>>>>>> Client déconnecté(1) <<<<<<<<<<");
@@ -142,6 +141,7 @@ public class SocketHandler implements Runnable{
         Message msg = Server.db.writeMsgToDB(author, body);
         notifAll(msg);
 
+        System.out.println("PUBLISH msg_id:" + msg.getIdent());
         response("OK");
     }
 
@@ -239,7 +239,7 @@ public class SocketHandler implements Runnable{
         }
         returnIds.deleteCharAt(returnIds.toString().length() - 1);
 
-        System.out.println("response : " + returnIds.toString());
+        System.out.println("MSG_IDS response : " + returnIds.toString());
         response("MSG_IDS", returnIds.toString());
     }
 
@@ -281,7 +281,7 @@ public class SocketHandler implements Runnable{
             return;
         }
 
-        System.out.println("MSG msg_id: " + msg.getIdent() + "\r\n" + msg.getBody());
+        System.out.println("MSG msg_id: " + id + " sent");
         response("MSG",msg.getEnTete() + "\n" +msg.getBody());
     }
 
@@ -306,6 +306,7 @@ public class SocketHandler implements Runnable{
         }
 
         Server.db.writeMsgToDB(author, body, Integer.parseInt(id));
+        System.out.println("REPLY TO MSG_ID: " + id);
         response("OK");
     }
 
@@ -329,6 +330,7 @@ public class SocketHandler implements Runnable{
         }
 
         Server.db.writeMsgToDB(author, researchedMsg.getBody(), true);
+        System.out.println("REPUBLISH MSG_ID: " + researchedMsg.getIdent());
         response("OK");
     }
 
@@ -355,10 +357,18 @@ public class SocketHandler implements Runnable{
             Server.connectedClients.put(connectedAuthor, clientSocketList);
         }
 
+        ArrayList<Integer> msgIds = Server.db.checkWaitingMsg(connectedAuthor);
         response("OK");
-        Server.db.checkWaitingMsg(connectedAuthor);
+        for(int id : msgIds){
+            System.out.println("sending MSG : " + id + "to " + connectedAuthor);
+            Message msg = Server.db.getMessageById(id);
+            if(msg != null){
+                notif(msg);
+            }
+        }
 
         printConnected();
+
     }
 
     public void subscribe() throws IOException {
@@ -381,6 +391,7 @@ public class SocketHandler implements Runnable{
         }
 
         Server.db.subscribe(connectedAuthor, m.group(1));
+        System.out.println(connectedAuthor + " subscribe to : " + m.group(1));
         response("OK");
     }
 
@@ -404,6 +415,7 @@ public class SocketHandler implements Runnable{
         }
 
         Server.db.unSubscribe(connectedAuthor, m.group(1));
+        System.out.println(connectedAuthor + "unsubscribe from : " + m.group(1));
         response("OK");
     }
 
