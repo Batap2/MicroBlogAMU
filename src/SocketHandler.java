@@ -356,6 +356,7 @@ public class SocketHandler implements Runnable{
         }
 
         response("OK");
+        Server.db.checkWaitingMsg(connectedAuthor);
 
         printConnected();
     }
@@ -409,6 +410,7 @@ public class SocketHandler implements Runnable{
     private void notifAll(Message msg) throws IOException {
         ArrayList<String> researched = new ArrayList<>();
         ArrayList<String> clients = new ArrayList<>();
+        ArrayList<String> diconnectedClients = new ArrayList<>();
 
         researched.add(msg.getAuthor());
         researched.addAll(msg.getTagList());
@@ -434,7 +436,13 @@ public class SocketHandler implements Runnable{
                 for(SocketHandler instance : instances){
                     instance.notif(msg);
                 }
+            } else {
+                diconnectedClients.add(client);
             }
+        }
+
+        for(String client : diconnectedClients){
+            Server.db.addMsgToWaitingList(msg.getIdent(), client);
         }
     }
 

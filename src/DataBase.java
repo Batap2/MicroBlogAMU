@@ -1,9 +1,12 @@
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 
@@ -13,6 +16,8 @@ public class DataBase {
     private Path msgDBPath;
     private File subscriptionDB;
     private Path subscriptionDBPath;
+    private File waitingMsgDB;
+    private Path waitingMsgDBPath;
 
     private int msgNumber = 0;
     private int lastMsgID = 0;
@@ -20,18 +25,25 @@ public class DataBase {
     public DataBase() throws IOException {
         msgDB = new File("msgDB");
         subscriptionDB = new File("subscriptionDB");
+        waitingMsgDB = new File("waitingMsgDB");
         if(msgDB.createNewFile()){
             System.out.println("msgDB created at : " + msgDB.getAbsolutePath());
         } else {
-            System.out.println("msgDB founded at : " + msgDB.getAbsolutePath());
+            System.out.println("msgDB found at : " + msgDB.getAbsolutePath());
         }
         if(subscriptionDB.createNewFile()){
             System.out.println("subscriptionDB created at : " + subscriptionDB.getAbsolutePath());
         } else {
-            System.out.println("subscriptionDB founded at : " + subscriptionDB.getAbsolutePath());
+            System.out.println("subscriptionDB found at : " + subscriptionDB.getAbsolutePath());
+        }
+        if(waitingMsgDB.createNewFile()){
+            System.out.println("waitingMsgDB created at : " + waitingMsgDB.getAbsolutePath());
+        } else {
+            System.out.println("waitingMsgDB found at : " + waitingMsgDB.getAbsolutePath());
         }
         msgDBPath = Paths.get("msgDB");
         subscriptionDBPath = Paths.get("subscriptionDB");
+        waitingMsgDBPath = Paths.get("waitingMsgDB");
 
         initLastIdAndMsgNumber();
         System.out.println("lastMsgID : " + lastMsgID + ", msgNumber : " + msgNumber);
@@ -123,6 +135,77 @@ public class DataBase {
         SubscriptionDBIO sub = new SubscriptionDBIO();
         sub.unSubscribe(author, subscription);
         return true;
+    }
+
+    public void addMsgToWaitingList(int id, String client) throws IOException {
+        WaitingMsgDBReader reader = new WaitingMsgDBReader();
+        File tempDBFile = new File("tempWaitingDB");
+        BufferedWriter writer = Files.newBufferedWriter(Paths.get("tempWaitingDB"));
+
+        String clientName = reader.nextWaitingClient();
+        if(clientName == null){
+            writer.write(client + " " + id + "\n");
+            waitingMsgDB.delete();
+            tempDBFile.renameTo(waitingMsgDB);
+            writer.close();
+            return;
+        }
+
+        while(clientName != null){
+            if(clientName.equals(client)){
+                writer.write(reader.getLine() + " " + id + "\n");
+            } else {
+                writer.write(reader.getLine());
+            }
+            clientName = reader.nextWaitingClient();
+        }
+
+        writer.write(client + " " + id + "\n");
+        waitingMsgDB.delete();
+        tempDBFile.renameTo(waitingMsgDB);
+        writer.close();
+    }
+
+    public ArrayList<Integer> checkWaitingMsg(String client) throws IOException {
+        ArrayList<Integer> msgIds = new ArrayList<>();
+        WaitingMsgDBReader reader = new WaitingMsgDBReader();
+
+        String clientName = reader.nextWaitingClient();
+        while(clientName != null){
+            if(client.equals(clientName)){
+                msgIds = reader.getIds();
+                deleteClientWaitList(client);
+                return msgIds;
+            }
+        }
+        return msgIds;
+    }
+
+    private void deleteClientWaitList(String client) throws IOException {
+        WaitingMsgDBReader reader = new WaitingMsgDBReader();
+        File tempDBFile = new File("tempWaitingDB2");
+        BufferedWriter writer = Files.newBufferedWriter(Paths.get("tempWaitingDB2"));
+
+        String clientName = reader.nextWaitingClient();
+        if(clientName == null){
+            waitingMsgDB.delete();
+            tempDBFile.renameTo(waitingMsgDB);
+            writer.close();
+            return;
+        }
+
+        while(clientName != null){
+            if(clientName.equals(client)){
+                continue;
+            } else {
+                writer.write(reader.getLine());
+            }
+            clientName = reader.nextWaitingClient();
+        }
+
+        waitingMsgDB.delete();
+        tempDBFile.renameTo(waitingMsgDB);
+        writer.close();
     }
 
     private int nextID(){

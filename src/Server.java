@@ -10,7 +10,7 @@ public class Server {
     static DataBase db;
     // liste de socketHandler car un client peut se connecter sur plusieurs appareils.
     //il a pas aimé le new hastable ?
-    static ConcurrentHashMap<String, ArrayList<SocketHandler>> connectedClients = new ConcurrentHashMap<>();
+    static Hashtable<String, ArrayList<SocketHandler>> connectedClients = new Hashtable<>();
 
     static {
         try {
@@ -26,15 +26,21 @@ public class Server {
 
         System.out.println("Server ready");
         ServerSocket ss = new ServerSocket(port);
+
         ExecutorService executorService = Executors.newWorkStealingPool();
 
         try{
             while(true){
+                Thread exitHandler = new Thread(new ExitHandler());
                 SocketHandler socketHandler = new SocketHandler(ss.accept());
                 executorService.execute(socketHandler);
             }
         } catch(IOException e){
             System.out.println("IOException");
         }
+    }
+
+    public static void stop(){
+        System.exit(0);
     }
 }
