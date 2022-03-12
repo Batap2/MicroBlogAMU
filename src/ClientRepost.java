@@ -5,7 +5,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class ClientRepost extends Client {
+public class ClientRepost extends ClientWithIdentification {
 
     private String pseudo;
 

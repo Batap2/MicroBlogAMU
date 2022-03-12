@@ -5,9 +5,10 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 
-public class ClientPublisher extends Client{
+public class ClientPublisher extends ClientWithIdentification{
 
     private String pseudo;
 
@@ -24,15 +25,14 @@ public class ClientPublisher extends Client{
 
         client.pseudo = client.identification(keyboard);
 
-        String entete = "PUBLISH author:@"+client.pseudo+"\r\n";
-
         System.out.println("Vous pouvez désormais entrer vos messages");
 
         while(keyboard.hasNext()){
             String corps = keyboard.nextLine();
 
-            corps = corps + "\r\n";
-            String message = entete + corps + "";
+            PublishRequest publishRequest = new PublishRequest(client.pseudo, corps);
+
+            String message = publishRequest.getEntete()+publishRequest.getBody();
             byte[] msg = message.getBytes();
 
             OutputStream outputStream = socket.getOutputStream();

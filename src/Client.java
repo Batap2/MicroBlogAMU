@@ -18,13 +18,5 @@ public abstract class Client {
         return socket;
     }
 
-    public String identification(Scanner keyboard){
-
-        System.out.println("Veuillez entrer votre nom d'utilisateur");
-        String pseudo = keyboard.nextLine();
-        System.out.println("Bienvenue @"+pseudo);
-        return pseudo;
-
-    }
 
 }

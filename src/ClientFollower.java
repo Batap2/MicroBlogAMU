@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ClientFollower extends Client{
@@ -61,12 +62,19 @@ public class ClientFollower extends Client{
                 clientFollower.tag = clientFollower.getOption();
             }
             if(clientFollower.message.length() != 0 && clientFollower.message.contains("id:")){
+                clientFollower.message = clientFollower.message.substring(3);
                 clientFollower.id = clientFollower.getOption();
             }
             if(clientFollower.message.length() != 0){
                 clientFollower.limit = clientFollower.getOption();
             }
 
+            /*ArrayList<String> parameters = new ArrayList<>();
+            parameters.add(clientFollower.author);
+            parameters.add(clientFollower.tag);
+            parameters.add(clientFollower.id);
+            parameters.add(clientFollower.limit);
+            RCV_IDSRequest request = new RCV_IDSRequest(parameters);*/
 
             String envoi = "RCV_IDS author:"+clientFollower.author;
             if(clientFollower.tag != null){
@@ -81,6 +89,7 @@ public class ClientFollower extends Client{
 
             envoi = envoi+"\r\n";
             byte[] msg = envoi.getBytes();
+            //byte[] msg = request.getEntete().getBytes();
 
             clientFollower.reinit();
 
@@ -88,6 +97,7 @@ public class ClientFollower extends Client{
             outputStream.write(msg);
 
             System.out.println(envoi);
+            //System.out.println(request.getEntete());
 
             //boucle pour avoir tous les id des messages, puis les redonner au serveur pour afficher les messages
             String allID = "";
