@@ -116,6 +116,7 @@ public class SubscriptionDBIO {
             }
             if(pass){
                 pass = false;
+                sub = nextSubscription();
                 continue;
             }
 

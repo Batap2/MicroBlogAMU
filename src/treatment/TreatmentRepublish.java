@@ -33,7 +33,22 @@ public class TreatmentRepublish extends Treatment {
         outputStream.write(message2);
 
         String reponse = inputStream.readLine();
-        System.out.println("Reponse : " + reponse);
+        /*if(reponse.equals("OK") || reponse.equals("ERROR")){
+            System.out.println("Reponse : " + reponse);
+        }
+        else if(reponse.equals("MSG")){
+            String receivedMessage = "";
+            while(inputStream.ready()){
+                receivedMessage = receivedMessage + " "+inputStream.readLine()+"\r\n";
+            }
+            System.out.println(receivedMessage);
+        }
+        else{
+            System.out.println("erreur");
+        }*/
+
+        System.out.println(reponse);
+
         return reponse;
     }
 

@@ -9,7 +9,6 @@ import java.util.concurrent.Executors;
 public class Server {
     static DataBase db;
     // liste de socketHandler car un client peut se connecter sur plusieurs appareils.
-    //il a pas aimé le new hastable ?
     static Hashtable<String, ArrayList<SocketHandler>> connectedClients = new Hashtable<>();
 
     static {

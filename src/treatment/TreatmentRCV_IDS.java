@@ -71,16 +71,33 @@ public class TreatmentRCV_IDS extends Treatment {
         outputStream.write(msg);
 
         String allID = "";
-        String response = inputStream.readLine();
-        if(!response.equals("MSG_IDS")){
+        String reponse = inputStream.readLine();
+
+        /*if(reponse.equals("MSG")){
+            String receivedMessage = "";
+            while(inputStream.ready()){
+                receivedMessage = receivedMessage + " "+inputStream.readLine()+"\r\n";
+            }
+            System.out.println(receivedMessage);
+        }
+        else if(reponse.equals("MSG_IDS")){
+            while(inputStream.ready()){
+                allID = inputStream.readLine();
+            }
+        }
+        else{
+            System.out.println("erreur");
+        }*/
+
+        if(!reponse.equals("MSG_IDS")){
             System.out.println("erreur");
         }
         else{
             while(inputStream.ready()){
                 allID = inputStream.readLine();
             }
-
         }
+
         System.out.println(allID);
         return allID;
     }

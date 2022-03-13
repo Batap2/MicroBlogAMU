@@ -7,7 +7,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class ClientMicroblogamu extends ClientWithIdentification {
+public class  ClientMicroblogamu extends ClientWithIdentification {
 
     private String pseudo;
     private TreatmentPublish traitementPublish;
