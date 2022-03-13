@@ -335,7 +335,7 @@ public class SocketHandler implements Runnable{
     }
 
     public void connect() throws IOException {
-        Pattern p = Pattern.compile("^CONNECT author:(@\\w+)$");
+        Pattern p = Pattern.compile("^CONNECT user:(@\\w+)$");
         Matcher m = p.matcher(received);
         if(!m.matches()){
             System.out.println("CONNECT syntax error");
