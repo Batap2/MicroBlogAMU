@@ -7,5 +7,5 @@ import java.util.Scanner;
 
 abstract public class Treatment {
 
-    abstract String treatment(OutputStream outputStream, BufferedReader inputStream) throws IOException;
+    abstract String treatment(OutputStream outputStream, BufferedReader inputStream) throws IOException, InterruptedException;
 }

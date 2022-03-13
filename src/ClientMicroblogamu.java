@@ -15,7 +15,7 @@ public class  ClientMicroblogamu extends ClientWithIdentification {
     private TreatmentReply treatmentReply;
     private TreatmentSubscribe treatmentSubscribe;
 
-    public static void main(String args[]) throws IOException {
+    public static void main(String args[]) throws IOException, InterruptedException {
 
         ClientMicroblogamu client = new ClientMicroblogamu();
         Socket socket = new Socket();

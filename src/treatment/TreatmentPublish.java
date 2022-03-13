@@ -27,7 +27,7 @@ public class TreatmentPublish extends Treatment {
         outputStream.write(msg);
 
         String reponse = inputStream.readLine();
-        /*if(reponse.equals("OK") || reponse.equals("ERROR")){
+        if(reponse.equals("OK") || reponse.equals("ERROR")){
             System.out.println("Reponse : " + reponse);
         }
         else if(reponse.equals("MSG")){
@@ -39,9 +39,9 @@ public class TreatmentPublish extends Treatment {
         }
         else{
             System.out.println("erreur");
-        }*/
+        }
 
-        System.out.println(reponse);
+        //System.out.println(reponse);
         return reponse;
     }
 

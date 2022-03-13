@@ -15,7 +15,7 @@ public class TreatmentConnect extends Treatment {
     }
 
     @Override
-    public String treatment(OutputStream outputStream, BufferedReader inputStream) throws IOException {
+    public String treatment(OutputStream outputStream, BufferedReader inputStream) throws IOException, InterruptedException {
 
         ConnectRequest request = new ConnectRequest(pseudo);
 
@@ -25,6 +25,7 @@ public class TreatmentConnect extends Treatment {
         outputStream.write(msg);
 
         String receivedMessage = "";
+        Thread.sleep(100);
         while(inputStream.ready()){
             receivedMessage = receivedMessage + " "+inputStream.readLine()+"\n";
         }

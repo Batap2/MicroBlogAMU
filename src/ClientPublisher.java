@@ -12,7 +12,7 @@ public class ClientPublisher extends ClientWithIdentification{
     private String pseudo;
     private TreatmentPublish traitementPublish;
 
-    public static void main(String args[]) throws IOException {
+    public static void main(String args[]) throws IOException, InterruptedException {
 
         ClientPublisher client = new ClientPublisher();
         Socket socket = new Socket();

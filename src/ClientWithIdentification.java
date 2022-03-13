@@ -17,7 +17,7 @@ abstract public class ClientWithIdentification extends Client {
 
     }
 
-    public String connection(Scanner keyboard, OutputStream outputStream, BufferedReader inputStream) throws IOException {
+    public String connection(Scanner keyboard, OutputStream outputStream, BufferedReader inputStream) throws IOException, InterruptedException {
         String pseudo = identification(keyboard);
         TreatmentConnect treatmentConnect = new TreatmentConnect(pseudo);
         treatmentConnect.treatment(outputStream, inputStream);

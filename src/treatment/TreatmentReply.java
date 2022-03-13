@@ -28,7 +28,7 @@ public class TreatmentReply extends Treatment {
 
         String reponse = inputStream.readLine();
 
-        /*if(reponse.equals("OK") || reponse.equals("ERROR")){
+        if(reponse.equals("OK") || reponse.equals("ERROR")){
             System.out.println("Reponse : " + reponse);
         }
         else if(reponse.equals("MSG")){
@@ -40,9 +40,9 @@ public class TreatmentReply extends Treatment {
         }
         else{
             System.out.println("erreur");
-        }*/
+        }
 
-        System.out.println(reponse);
+        //System.out.println(reponse);
 
         return reponse;
     }

@@ -33,7 +33,7 @@ public class TreatmentRepublish extends Treatment {
         outputStream.write(message2);
 
         String reponse = inputStream.readLine();
-        /*if(reponse.equals("OK") || reponse.equals("ERROR")){
+        if(reponse.equals("OK") || reponse.equals("ERROR")){
             System.out.println("Reponse : " + reponse);
         }
         else if(reponse.equals("MSG")){
@@ -45,9 +45,9 @@ public class TreatmentRepublish extends Treatment {
         }
         else{
             System.out.println("erreur");
-        }*/
+        }
 
-        System.out.println(reponse);
+        //System.out.println(reponse);
 
         return reponse;
     }
