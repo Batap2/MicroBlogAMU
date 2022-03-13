@@ -1,6 +1,12 @@
+import request.ConnectRequest;
+import treatment.TreatmentConnect;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Scanner;
 
-abstract public class ClientWithIdentification extends  Client {
+abstract public class ClientWithIdentification extends Client {
 
     public String identification(Scanner keyboard){
 
@@ -9,6 +15,13 @@ abstract public class ClientWithIdentification extends  Client {
         System.out.println("Bienvenue @"+pseudo);
         return pseudo;
 
+    }
+
+    public String connection(Scanner keyboard, OutputStream outputStream, BufferedReader inputStream) throws IOException {
+        String pseudo = identification(keyboard);
+        TreatmentConnect treatmentConnect = new TreatmentConnect(pseudo);
+        treatmentConnect.treatment(outputStream, inputStream);
+        return pseudo;
     }
 
 }

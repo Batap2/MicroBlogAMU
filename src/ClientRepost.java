@@ -1,16 +1,21 @@
+import treatment.TreatmentRCV_IDS;
+import treatment.TreatmentRepublish;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ClientRepost extends ClientWithIdentification {
 
     private String pseudo;
+    private TreatmentRCV_IDS treatment;
+    private TreatmentRepublish nextTreatment;
 
     public static void main(String args[]) throws IOException {
-
 
         ClientRepost clientRepost = new ClientRepost();
         Socket socket = new Socket();
@@ -18,53 +23,26 @@ public class ClientRepost extends ClientWithIdentification {
 
         BufferedReader inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+        OutputStream outputStream = socket.getOutputStream();
+
         Scanner keyboard = new Scanner(System.in);
         clientRepost.pseudo = clientRepost.identification(keyboard);
+        clientRepost.nextTreatment = new TreatmentRepublish(clientRepost.pseudo);
 
         System.out.println("De qui voulez-vous republier les messages ?");
-
-        String author;
+        System.out.println("Format : @user\n");
 
         while(keyboard.hasNextLine()){
 
-            author = keyboard.nextLine();
+            String message = keyboard.nextLine();
+            clientRepost.treatment = new TreatmentRCV_IDS(message);
+            ArrayList<String> parameters = clientRepost.treatment.getParameters();
 
-            String envoi = "RCV_IDS author:@"+author+"\r\n";
-            byte[] msg = envoi.getBytes();
-
-            OutputStream outputStream = socket.getOutputStream();
-            outputStream.write(msg);
-
-            String allID = "";
-            String response = inputStream.readLine();
-            if(!response.equals("MSG_IDS")){
-                System.out.println("erreur");
-            }
-            else{
-                while(inputStream.ready()){
-                    allID = inputStream.readLine()+"\r\n";
-                }
-
+            if(parameters.get(1) != null || parameters.get(2) != null || parameters.get(3) != null){
+                System.out.println("erreur de format");
             }
 
-            int lengthResponse = allID.length();
-            while(allID.contains(" ")){
-                String id = allID.substring(0, allID.indexOf(" "));
-                allID = allID.substring(allID.indexOf(" ")+1, lengthResponse);
-                lengthResponse = allID.length();
-                String requete = "REPUBLISH author:@"+clientRepost.pseudo+" msg_id:"+id+"\r\n";
-                byte[] message = requete.getBytes();
-
-                OutputStream outputStream2 = socket.getOutputStream();
-                outputStream2.write(message);
-
-                System.out.println("Reponse : " + inputStream.readLine());
-
-            }
-
-
-
-
+            clientRepost.treatment.treatment(outputStream, inputStream, clientRepost.nextTreatment);
 
         }
 
