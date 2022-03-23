@@ -1,8 +1,9 @@
+package Server;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,6 +13,7 @@ import java.util.LinkedList;
 
 public class DataBase {
 
+    private int serverId;
     private File msgDB;
     private Path msgDBPath;
     private File subscriptionDB;
@@ -22,10 +24,11 @@ public class DataBase {
     private int msgNumber = 0;
     private int lastMsgID = 0;
 
-    public DataBase() throws IOException {
-        msgDB = new File("msgDB");
-        subscriptionDB = new File("subscriptionDB");
-        waitingMsgDB = new File("waitingMsgDB");
+    public DataBase(int serverId) throws IOException {
+        this.serverId = serverId;
+        msgDB = new File("msgDB"+serverId);
+        subscriptionDB = new File("subscriptionDB"+serverId);
+        waitingMsgDB = new File("waitingMsgDB"+serverId);
         if(msgDB.createNewFile()){
             System.out.println("msgDB created at : " + msgDB.getAbsolutePath());
         } else {
@@ -41,9 +44,9 @@ public class DataBase {
         } else {
             System.out.println("waitingMsgDB found at : " + waitingMsgDB.getAbsolutePath());
         }
-        msgDBPath = Paths.get("msgDB");
-        subscriptionDBPath = Paths.get("subscriptionDB");
-        waitingMsgDBPath = Paths.get("waitingMsgDB");
+        msgDBPath = Paths.get("msgDB"+serverId);
+        subscriptionDBPath = Paths.get("subscriptionDB"+serverId);
+        waitingMsgDBPath = Paths.get("waitingMsgDB"+serverId);
 
         initLastIdAndMsgNumber();
         System.out.println("lastMsgID : " + lastMsgID + ", msgNumber : " + msgNumber);
@@ -71,7 +74,7 @@ public class DataBase {
     }
 
     public Message getMessageById(int id) throws IOException {
-        MsgDBReader msgDBReader = new MsgDBReader();
+        MsgDBReader msgDBReader = new MsgDBReader(serverId);
         if(lastMsgID == 0){
             return null;
         }
@@ -89,7 +92,7 @@ public class DataBase {
 
     // params : [author, tag, since_id, limit] null si ignoré
     public Deque<Integer> getIdFromRCV_IDS(String[] params) throws IOException {
-        MsgDBReader msgDBReader = new MsgDBReader();
+        MsgDBReader msgDBReader = new MsgDBReader(serverId);
         Deque<Integer> idList = new LinkedList<>();
 
 
@@ -138,9 +141,9 @@ public class DataBase {
     }
 
     public void addMsgToWaitingList(int id, String client) throws IOException {
-        WaitingMsgDBReader reader = new WaitingMsgDBReader();
-        File tempDBFile = new File("tempWaitingDB");
-        BufferedWriter writer = Files.newBufferedWriter(Paths.get("tempWaitingDB"));
+        WaitingMsgDBReader reader = new WaitingMsgDBReader(serverId);
+        File tempDBFile = new File("tempWaitingDB"+serverId);
+        BufferedWriter writer = Files.newBufferedWriter(Paths.get("tempWaitingDB"+serverId));
 
         String clientName = reader.nextWaitingClient();
         if(clientName == null){
@@ -174,7 +177,7 @@ public class DataBase {
 
     public ArrayList<Integer> checkWaitingMsg(String client) throws IOException {
         ArrayList<Integer> msgIds = new ArrayList<>();
-        WaitingMsgDBReader reader = new WaitingMsgDBReader();
+        WaitingMsgDBReader reader = new WaitingMsgDBReader(serverId);
 
         String clientName = reader.nextWaitingClient();
         while(clientName != null){
@@ -189,9 +192,9 @@ public class DataBase {
     }
 
     private void deleteClientWaitList(String client) throws IOException {
-        WaitingMsgDBReader reader = new WaitingMsgDBReader();
-        File tempDBFile = new File("tempWaitingDB2");
-        BufferedWriter writer = Files.newBufferedWriter(Paths.get("tempWaitingDB2"));
+        WaitingMsgDBReader reader = new WaitingMsgDBReader(serverId);
+        File tempDBFile = new File("tempWaitingDB2"+serverId);
+        BufferedWriter writer = Files.newBufferedWriter(Paths.get("tempWaitingDB2"+serverId));
 
         String clientName = reader.nextWaitingClient();
         if(clientName == null){
@@ -227,7 +230,7 @@ public class DataBase {
     }
 
     private void initLastIdAndMsgNumber() throws IOException {
-        MsgDBReader msgDBReader = new MsgDBReader();
+        MsgDBReader msgDBReader = new MsgDBReader(serverId);
         int msg_number = 0;
 
         Message temp = msgDBReader.nextMsg();

@@ -1,3 +1,5 @@
+package Server;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -8,14 +10,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MsgDBReader {
+    private int serverId;
     private File dbFile;
     private Path dbPath;
     BufferedReader db;
 
-    public MsgDBReader() throws IOException {
-        dbFile = new File("msgDB");
+    public MsgDBReader(int serverId) throws IOException {
+        this.serverId = serverId;
+        dbFile = new File("msgDB"+serverId);
         dbFile.createNewFile();
-        dbPath = Paths.get("msgDB");
+        dbPath = Paths.get("msgDB"+serverId);
         db = Files.newBufferedReader(dbPath);
     }
 

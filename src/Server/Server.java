@@ -1,27 +1,28 @@
+package Server;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server {
+
     static DataBase db;
     // liste de socketHandler car un client peut se connecter sur plusieurs appareils.
     static Hashtable<String, ArrayList<SocketHandler>> connectedClients = new Hashtable<>();
 
-    static {
-        try {
-            db = new DataBase();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static void main(String args[]) throws IOException {
 
+        if(args.length != 1){
+            System.out.println("usage : Server.java <serverId>");
+            System.exit(-1);
+        }
+
+        int serverId = Integer.parseInt(args[0]);
         int port = 12345;
+        db = new DataBase(serverId);
 
         System.out.println("Server ready");
         ServerSocket ss = new ServerSocket(port);
@@ -30,7 +31,6 @@ public class Server {
 
         try{
             while(true){
-                Thread exitHandler = new Thread(new ExitHandler());
                 SocketHandler socketHandler = new SocketHandler(ss.accept());
                 executorService.execute(socketHandler);
             }
@@ -39,7 +39,4 @@ public class Server {
         }
     }
 
-    public static void stop(){
-        System.exit(0);
-    }
 }
