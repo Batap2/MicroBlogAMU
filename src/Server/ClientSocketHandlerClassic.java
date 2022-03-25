@@ -8,14 +8,14 @@ import java.util.Deque;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SocketHandler implements Runnable{
+public class ClientSocketHandlerClassic implements Runnable, ClientSocketHandler{
 
     private enum Request {PUBLISH, RCV_IDS, RCV_MSG, REPLY, REPUBLISH, CONNECT, SUBSCRIBE, UNSUBSCRIBE, UNKNOWN};
     private Socket socket;
     private String received;
     private String connectedAuthor = null;
 
-    public SocketHandler(Socket s){
+    public ClientSocketHandlerClassic(Socket s){
         this.socket = s;
     }
 
@@ -352,7 +352,7 @@ public class SocketHandler implements Runnable{
         if(Server.connectedClients.containsKey(connectedAuthor)){
             Server.connectedClients.get(connectedAuthor).add(this);
         } else {
-            ArrayList<SocketHandler> clientSocketList = new ArrayList<>();
+            ArrayList<ClientSocketHandler> clientSocketList = new ArrayList<>();
             clientSocketList.add(this);
             Server.connectedClients.put(connectedAuthor, clientSocketList);
         }
@@ -444,8 +444,8 @@ public class SocketHandler implements Runnable{
         }
         for(String client : clients){
             if(Server.connectedClients.containsKey(client)){
-                ArrayList<SocketHandler> instances = Server.connectedClients.get(client);
-                for(SocketHandler instance : instances){
+                ArrayList<ClientSocketHandler> instances = Server.connectedClients.get(client);
+                for(ClientSocketHandler instance : instances){
                     instance.notif(msg);
                 }
             } else {
@@ -477,7 +477,7 @@ public class SocketHandler implements Runnable{
 
     public void printConnected(){
         System.out.println("---------Connected---------");
-        for(ArrayList<SocketHandler> l : Server.connectedClients.values()){
+        for(ArrayList<ClientSocketHandler> l : Server.connectedClients.values()){
             System.out.print("[ ");
             for(int i = 0; i < l.size(); i++){
                 System.out.print(l.get(i).getConnectedAuthor()+" ");

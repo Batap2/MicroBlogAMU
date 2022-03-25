@@ -11,7 +11,8 @@ public class Server {
 
     static DataBase db;
     // liste de socketHandler car un client peut se connecter sur plusieurs appareils.
-    static Hashtable<String, ArrayList<SocketHandler>> connectedClients = new Hashtable<>();
+    static Hashtable<String, ArrayList<ClientSocketHandler>> connectedClients = new Hashtable<>();
+
 
     public static void main(String args[]) throws IOException {
 
@@ -31,7 +32,7 @@ public class Server {
 
         try{
             while(true){
-                SocketHandler socketHandler = new SocketHandler(ss.accept());
+                ClientSocketHandler socketHandler = new ClientSocketHandlerClassic(ss.accept());
                 executorService.execute(socketHandler);
             }
         } catch(IOException e){
