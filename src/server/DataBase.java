@@ -141,12 +141,12 @@ public class DataBase {
 
     // author = @author, subscription = [@author | #tag]
     public void subscribe(String author, String subscription) throws IOException {
-        SubscriptionDBIO sub = new SubscriptionDBIO();
+        SubscriptionDBIO sub = new SubscriptionDBIO(serverId);
         sub.subscribe(author, subscription);
     }
 
     public boolean unSubscribe(String author, String subscription) throws IOException {
-        SubscriptionDBIO sub = new SubscriptionDBIO();
+        SubscriptionDBIO sub = new SubscriptionDBIO(serverId);
         sub.unSubscribe(author, subscription);
         return true;
     }

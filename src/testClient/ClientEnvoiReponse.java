@@ -11,7 +11,7 @@ public class ClientEnvoiReponse {
     public static void main(String args[] ) throws IOException {
 
         Socket socket = new Socket();
-        InetSocketAddress inetSocketAddress = new InetSocketAddress("localhost", 12345);
+        InetSocketAddress inetSocketAddress = new InetSocketAddress("localhost", 12340);
         
         socket.connect(inetSocketAddress);
 

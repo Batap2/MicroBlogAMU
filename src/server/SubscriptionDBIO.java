@@ -14,10 +14,10 @@ public class SubscriptionDBIO {
     String line;
     BufferedReader db;
 
-    public SubscriptionDBIO() throws IOException {
-        dbFile = new File("subscriptionDB");
+    public SubscriptionDBIO(int serverId) throws IOException {
+        dbFile = new File("subscriptionDB"+serverId);
         dbFile.createNewFile();
-        dbPath = Paths.get("subscriptionDB");
+        dbPath = Paths.get("subscriptionDB"+serverId);
         db = Files.newBufferedReader(dbPath);
     }
 

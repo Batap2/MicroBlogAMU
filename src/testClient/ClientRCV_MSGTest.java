@@ -10,7 +10,7 @@ import java.net.Socket;
 public class ClientRCV_MSGTest {
     public static void main(String args[] ) throws IOException {
         Socket s = new Socket();
-        InetSocketAddress i = new InetSocketAddress("localhost", 12345);
+        InetSocketAddress i = new InetSocketAddress("localhost", 12340);
         s.connect(i);
         BufferedReader inputStream = new BufferedReader(new InputStreamReader(s.getInputStream()));
 

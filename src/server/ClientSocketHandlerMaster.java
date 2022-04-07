@@ -422,7 +422,7 @@ public class ClientSocketHandlerMaster implements Runnable, ClientSocketHandler{
         researched.add(msg.getAuthor());
         researched.addAll(msg.getTagList());
 
-        SubscriptionDBIO sub = new SubscriptionDBIO();
+        SubscriptionDBIO sub = new SubscriptionDBIO(0);
 
         Subscription subscription = sub.nextSubscription();
         while(subscription != null){

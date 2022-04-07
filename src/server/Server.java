@@ -38,7 +38,7 @@ public class Server {
 
         try{
             while(true){
-                ClientSocketHandler socketHandler = new ClientSocketHandlerMaster(ss.accept());
+                ClientSocketHandler socketHandler = new ClientSocketHandlerClassic(ss.accept());
                 executorService.execute(socketHandler);
             }
         } catch(IOException e){

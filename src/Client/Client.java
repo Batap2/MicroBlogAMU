@@ -13,7 +13,7 @@ public abstract class Client {
         InetAddress inetAddress = InetAddress.getLocalHost();
         String ip = inetAddress.getHostAddress();
 
-        int port = 12345;
+        int port = 12340;
 
         InetSocketAddress inetSocketAddress = new InetSocketAddress(ip, port);
         socket.connect(inetSocketAddress);

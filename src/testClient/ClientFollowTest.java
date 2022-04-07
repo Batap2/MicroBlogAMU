@@ -10,14 +10,14 @@ import java.net.Socket;
 public class ClientFollowTest {
     public static void main(String args[] ) throws IOException, InterruptedException {
         Socket s = new Socket();
-        InetSocketAddress i = new InetSocketAddress("localhost", 12345);
+        InetSocketAddress i = new InetSocketAddress("localhost", 12340);
         s.connect(i);
         BufferedReader inputStream = new BufferedReader(new InputStreamReader(s.getInputStream()));
 
-        String str = "CONNECT author:@batap\n";
+        String str = "CONNECT user:@ClientFollowTest\n";
         byte[] msg = str.getBytes();
         s.getOutputStream().write(msg);
-        /*
+
         Thread.sleep(500);
 
         str = "SUBSCRIBE author:@lol\n";
@@ -26,11 +26,9 @@ public class ClientFollowTest {
 
         Thread.sleep(500);
 
-        str = "SUBSCRIBE author:@publishMan\n";
+        str = "SUBSCRIBE author:@PublishMan\n";
         msg = str.getBytes();
         s.getOutputStream().write(msg);
-
-         */
 
         while(true){
             String received = inputStream.readLine();
